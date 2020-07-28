@@ -1,8 +1,8 @@
 const readline = require('readline');
 const fs = require('fs');
 
-
-const todos = [];
+// let todos
+let todos = [];
 const interface = readline.createInterface({input: process.stdin, output: process.stdout})
 const menu = `
 Your options are:
@@ -15,33 +15,48 @@ Your options are:
 
 `
 
+// get JSON instead of CSV
+//   and put the data in our javascript without .split
 const loadTodos = function() {
-  todos.splice(0);
-  const file = fs.readFileSync('./todos.csv', 'utf8');
-  const rows = file.split('\n');
-  for (const rowString of rows) {
-    const todo = rowString.split(',')
-    todos.push(todo);
+  const file = fs.readFileSync(__dirname + '/../back-end/todos.json' ,'utf8');
+  const toDosObject = JSON.parse(file)
+  
+  
+  todos = toDosObject.todos
+  console.log(todos)
   }
-}
 
+
+
+  //    Get rid of everything before the writeFileSync call
+  //     add the __dirname value, first argument of writeFileSync
+  //    create an object with a todos property, 
+  //    set that todos property to be our global todos array.
+  //    Next: create a newContents variable
+  //    set it to the result of calling JSON.stringify our object
+  //    This will give us a JSON string we can write to the file
 const saveTodos = function() {
-  const rowStrings = [];
-  for (const todo of todos) {
-    rowStrings.push(todo[0] + ',' + todo[1]);
-  }
 
-  const newContents = rowStrings.join('\n');
-  fs.writeFileSync('./todos.csv', newContents);
+  let object ={ todos: todos}
+  let newContents = JSON.stringify(object)
+  fs.writeFileSync(__dirname + '/../back-end/todos.json', newContents);
+
 }
 
+
+
+
+
+
+//get rid of text, isComplete,  priority properties
+//    replace them with todo.text, todo.isComplete, and todo.priority
 const displayTodos = function(shouldPrintNumber) {
   console.log('\nHere are your current todos:\n')
   for (let i = 0; i < todos.length; i++) {
     const todo = todos[i];
-    const text = todo[0];
-    const isComplete = todo[1];
-    const priority = todo[2];
+    const text = todo.text;
+    const isComplete = todo.isComplete;
+    const priority = todo.priority;
     const num = i + 1;
     let listSymbol = '*';
     let mark = '✖';
